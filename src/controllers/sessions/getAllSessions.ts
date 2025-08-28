@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { Request, Response } from "express";
 import { CResponse } from "@/lib/response";
+import { Request, Response } from "express";
 
-export const sessions = async (req: Request, res: Response) => {
+export const getAllSessions = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
 

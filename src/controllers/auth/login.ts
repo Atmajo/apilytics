@@ -53,6 +53,7 @@ export const login = async (req: Request, res: Response) => {
           userId: user.id,
           ipAddress: ip,
           location: ipLocation.country_name,
+          userAgent: req.headers["user-agent"] || "Unknown",
         },
       });
     }

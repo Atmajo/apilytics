@@ -1,10 +1,10 @@
 import { sendEmail } from "@/lib/sendEmail";
-import { resetPasswordTemplate } from "@/templates/resetPassword";
+import { verifyAccountTemplate } from "@/templates/verifyAccount";
 
 export const sendVerifyMail = async (to: string, link: string) => {
   const subject = "Password Reset Request";
-  
-  const html = resetPasswordTemplate(link);
+
+  const html = verifyAccountTemplate(link);
 
   await sendEmail(to, subject, html);
 };
