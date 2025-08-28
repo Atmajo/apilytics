@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  email      String    @unique
+  username   String
+  password   String
+  isVerified Boolean   @default(false)
+  otp        String?
+  otpExpires DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  plans              Plans[]
+  apiKeys            ApiKeys[]
+  apiUsage           ApiUsage[]
+  invoices           Invoices[]
+  sessions           Sessions[]
+  activeApiEndpoints ActiveApiEndpoints[]
+}
+
+model Sessions {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ipAddress String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model Invoices {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount      Float
+  status      InvoiceStatus @default(PENDING)
+  periodStart DateTime
+  periodEnd   DateTime
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  apiUsage ApiUsage[]
+}
+
+model ApiKeys {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plans {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  monthlyQuota    Int
+  pricePerRequest Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ApiEndpoints {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  path      String
+  unitCost  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activeApiEndpoints ActiveApiEndpoints[]
+}
+
+model ActiveApiEndpoints {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  costPerUser Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  apiEndpointId String       @db.ObjectId
+  apiEndpoint   ApiEndpoints @relation(fields: [apiEndpointId], references: [id], onDelete: Cascade)
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  apiUsage ApiUsage[]
+}
+
+model ApiUsage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  requestSize  Int
+  responseTime Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  activeApiEndpointId String             @db.ObjectId
+  activeApiEndpoint   ActiveApiEndpoints @relation(fields: [activeApiEndpointId], references: [id])
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id])
+
+  invoiceId String   @db.ObjectId
+  invoice   Invoices @relation(fields: [invoiceId], references: [id])
+}
