@@ -1,4 +1,4 @@
-import { Response, response } from "express";
+import { Response } from "express";
 
 interface SuccessResponse<T = any> {
   status: "success";
@@ -15,24 +15,24 @@ interface ErrorResponse {
 }
 
 class ResponseClass {
-  success<T = any>(data: T): Response<SuccessResponse<T>> {
+  success<T = any>(res: Response, data: T): Response<SuccessResponse<T>> {
     const responseObj: SuccessResponse<T> = {
       status: "success",
       success: true,
       data,
       code: 200,
     };
-    return response.status(200).json(responseObj);
+    return res.status(200).json(responseObj);
   }
 
-  error(message: string, code?: number): Response<ErrorResponse> {
+  error(res: Response, message: string, code?: number): Response<ErrorResponse> {
     const responseObj: ErrorResponse = {
       status: "error",
       success: false,
       message,
       code,
     };
-    return response.status(code || 400).json(responseObj);
+    return res.status(code || 400).json(responseObj);
   }
 }
 

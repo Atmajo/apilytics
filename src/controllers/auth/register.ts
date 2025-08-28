@@ -19,7 +19,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (user) {
-      return CResponse.error("User already exists", 409);
+      return CResponse.error(res, "User already exists", 409);
     }
 
     const otp = generateOtp();
@@ -51,9 +51,9 @@ export const register = async (req: Request, res: Response) => {
     const link = `${config.frontendUrl}/auth/verify?token=${token}`;
     await sendVerifyMail(newUser.email, link);
 
-    return CResponse.success({ message: "Registered successfully" });
+    return CResponse.success(res, { message: "Registered successfully" });
   } catch (error) {
     console.error("Registration error:", error);
-    return CResponse.error("Registration failed", 500);
+    return CResponse.error(res, "Registration failed", 500);
   }
 };
