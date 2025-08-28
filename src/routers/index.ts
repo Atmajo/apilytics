@@ -3,14 +3,11 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { getClientIp } from "request-ip";
 import { authRouter } from "./authRouter";
+import { apiRouter } from "./apiRouter";
 
 const router = Router();
 
-router.get("/", (req: Request, res: Response) => {
-  const ip = getClientIp(req);
-  console.info(ip);
-  res.send("Express + TypeScript Server is running");
-});
+router.get("/", apiRouter);
 
 router.get("/logs", (req: Request, res: Response) => {
   try {
