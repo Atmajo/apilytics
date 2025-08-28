@@ -1,5 +1,5 @@
-import { sessions } from "@/controllers/auth/sessions";
 import { verifyToken } from "@/middlewares/token";
+import { sessions } from "@/controllers/sessions/sessions";
 import { Router } from "express";
 
 const router = Router();
